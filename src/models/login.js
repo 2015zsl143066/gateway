@@ -21,6 +21,7 @@ export default {
   effects: {
     *fetch({ payload }, { call, put }) {  // eslint-disable-line
       const result = yield call(LoginServie.query, payload)
+      console.log(result);
       yield put({ type: 'save' ,payload:{"key":"value", modalVisible: true ,message: result.data.detail ,
         success:result.data.success}});
     },
