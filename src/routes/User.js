@@ -63,7 +63,7 @@ class User extends React.Component {
       key:'action',
       render:(text,record)=>(
         //record当前行的所有数据
-        console.log('record',record),
+        //console.log('record',record),
         <span>
           <Button type="primary" onClick={()=>{
       that.props.dispatch({
@@ -76,7 +76,7 @@ class User extends React.Component {
            type:'user/save',
             payload:{visible:true, modalType:'edit', currentItem: record}
          })
-          }}>xiugai</Button>
+          }}>修改</Button>
         </span>
       )
     }
@@ -100,7 +100,7 @@ class User extends React.Component {
 
      that.props.dispatch({
        type:"user/save",
-       payload:{visible:true},
+       payload:{visible:true,  modalType:'create', currentItem:{}},
        }
 
      )
@@ -112,11 +112,20 @@ class User extends React.Component {
         if(err){
           return false;
         }
-       console.log(values);
-        that.props.dispatch({
-          type:"user/fetchCreat",
-          payload:{...values, phone: Number(values.phone)},
-        })
+       console.log("values",values);
+        if(that.props.modalType==='create'){
+          that.props.dispatch({
+            type:"user/fetchCreat",
+            payload:{...values, phone: Number(values.phone)},
+          })
+        }
+        else{
+          that.props.dispatch({
+            type:'user/fetchUpdate',
+            payload:{...values,phone: Number(values.phone),id:that.props.currentItem.id}
+          })
+        }
+
       })
 
 
@@ -125,7 +134,7 @@ class User extends React.Component {
       console.log(e);
     that.props.dispatch({
       type:"user/save",
-      payload:{visible:false, modalType:'create', currentItem:{}}
+      payload:{visible:false,}
       }
 
     )
@@ -140,7 +149,7 @@ class User extends React.Component {
         <div style={{marginLeft:"90%",marginTop:"10px"}}>
           <Button type="primary" onClick={showModal} >创建</Button>
           <Modal
-            title="Basic Modal"
+            title={this.props.modalType==='create' ? '创建':'编辑'}
             visible={this.props.visible}
             onOk={handleOk}
             onCancel={handleCancel}

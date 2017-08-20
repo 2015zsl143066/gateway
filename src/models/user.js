@@ -92,13 +92,47 @@ export default {
       console.log('从后台获取的数据为',result)
       yield put({ type: 'save' ,payload:{}});
       if(result.status==200&&result.data.success==true){
- //shuan xin ye mian
+ //刷新页面
         yield put(routerRedux.push(
           {
             pathname:'/user',
             query:{
               page:page,
               size:size
+            }
+          }
+        ));
+      }
+      else{
+        message.error(result.data.detail);
+      }
+
+    },
+    *fetchUpdate({ payload }, { call, put,select }) {  // eslint-disable-line
+      const page = yield select(state => state.user.page)
+      const size = yield select(state=>state.user.size)
+      console.log("图示",payload);
+      const result = yield call(UserServie.update, payload)
+      console.log('从后台获取的数据为',result)
+      yield put({ type: 'save' ,payload:{}});
+      if(result.status==200&&result.data.success==true){
+        yield put(
+          {
+            type:"save",
+            payload:{
+              visible:false
+            }
+          }
+        )
+ //刷新页面
+
+        yield put(routerRedux.push(
+          {
+            pathname:'/user',
+            query:{
+              page:page,
+              size:size,
+
             }
           }
         ));

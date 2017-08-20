@@ -35,3 +35,13 @@ export function delet(aa) {
 
 //  return request('/api/login',{"method":"post","data":bb});
 }
+export function update(aa) {
+
+  return axios.put("/api/employee",aa
+  ).catch(err=>{
+    console.log(err)
+    return { ...err.response, data:{ detail: '无法连接网络'}}
+  });
+
+//  return request('/api/login',{"method":"post","data":bb});
+}
