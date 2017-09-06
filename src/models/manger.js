@@ -5,6 +5,9 @@
  * Created by Tian on 2017/8/16.
  */
 import   *  as MangerServie from "../services/manger"
+import { routerRedux } from 'dva/router';
+import { message } from 'antd';
+
 export default {
 
   namespace: 'manger',
@@ -16,7 +19,10 @@ export default {
     size:10,
     total:0,
     page:1,
-    visible:false
+    visible:false,
+    currentItem:{},
+    modalType:'create'
+
   },
 
   subscriptions: {
@@ -61,7 +67,76 @@ export default {
       }
 
     },
+    *fetchCreat({ payload }, { call, put,select }) {  // eslint-disable-line
+      const result = yield call(MangerServie.creat,payload)
+      if(result.status==200&&result.data.success==true){
+        const page = yield select(state=>state.manger.page)
+        const size = yield select(state=>state.manger.size)
+        yield put({
+          type:'save',
+          payload:{
+            visible:false
+          }
+        })
+        yield put(routerRedux.push(
+          {
+            pathname:'/manger',
+            query:{
+              page:page,
+              size:size
+            }
+          }
+        ))
+      }
+      else{
+        message.error('This is a message of error');
+      }
+
+    },
+    *fetchDelet({payload},{call,put,select}){
+      const result = yield call(MangerServie.delet,payload)
+      if(result.status==200&&result.data.success==true){
+        const page = yield select(state=>state.manger.page)
+        const size = yield select(state=>state.manger.size)
+        yield put(routerRedux.push(
+          {
+            pathname:'/manger',
+            query:{
+              page:page,
+              size:size
+            }
+          }
+        ));
+      }
+      else{
+        message.error(result.data.detail);
+      }
+    },
+    *fetchUpdate({payload},{call,put,select}){
+       const result = yield call(MangerServie.update,payload)
+     if(result.status==200&&result.data.success==true){
+         const page = yield select(state=>state.manger.page)
+         const size = yield select(state=>state.manger.size)
+         yield put(
+         {
+           type:'save',
+           payload:{visible:false}
+
+         }
+       )
+       yield put(routerRedux.push(
+         {
+           pathname:'manger',
+           query:{
+             page:page,
+             size:size
+           }
+         }
+       ))
+     }
+    }
   },
+
 
   reducers: {
     save(state, action) {

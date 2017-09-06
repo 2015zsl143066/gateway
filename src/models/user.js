@@ -54,13 +54,14 @@ export default {
         page:result.data.page}});
     },
     *fetchCreat({ payload }, { call, put,select }) {  // eslint-disable-line
-      const page = yield select(state => state.user.page)
-      const size = yield select(state=>state.user.size)
+
       console.log("图示",payload);
       const result = yield call(UserServie.creat, payload)
       console.log('从后台获取的数据为',result)
       yield put({ type: 'save' ,payload:{}});
       if(result.status==200&&result.data.success==true){
+        const page = yield select(state => state.user.page)
+        const size = yield select(state=>state.user.size)
         yield put(
           {
             type:"save",
@@ -85,14 +86,16 @@ export default {
 
     },
     *fetchDelet({ payload }, { call, put,select }) {  // eslint-disable-line
-      const page = yield select(state => state.user.page)
-      const size = yield select(state=>state.user.size)
+
       console.log("图示",payload);
       const result = yield call(UserServie.delet, payload)
       console.log('从后台获取的数据为',result)
       yield put({ type: 'save' ,payload:{}});
       if(result.status==200&&result.data.success==true){
- //刷新页面
+
+        const page = yield select(state => state.user.page)
+        const size = yield select(state=>state.user.size)
+        //刷新页面
         yield put(routerRedux.push(
           {
             pathname:'/user',

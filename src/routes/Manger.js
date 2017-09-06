@@ -4,7 +4,7 @@
 import React from 'react';
 import { connect } from 'dva';
 import styles from './IndexPage.css';
-import {Table,Icon,Button,Form,Radio,InputNumber} from 'antd';
+import {Table,Icon,Button,Form,Radio,InputNumber,Input} from 'antd';
 import { Pagination,Modal } from 'antd';
 import { routerRedux } from 'dva/router';
 const FormItem = Form.Item;
@@ -21,32 +21,46 @@ class Manger extends React.Component {
 
     },{
       title: '姓名',
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'username',
+      key: 'username',
 
     }, {
       title: '年龄',
       dataIndex: 'age',
       key: 'age',
-    }, {
-      title: '地址',
-      dataIndex: 'address',
-      key: 'address',
-    }, {
-      title: '电话',
-      dataIndex: 'phone',
-      key: 'phone',
-
-    }, {
+    },  {
       title: '创建时间',
       dataIndex: 'stime',
       key: 'stime',
 
     },{
-      title: '昵称',
-      dataIndex: 'nickname',
-      key: 'nickname',
+      title: '邮箱',
+      dataIndex: 'email',
+      key: 'email',
 
+    },{
+      title:'action',
+      dataIndex:'action',
+      key:'action',
+      render:(text,record)=>(
+
+        <span>
+          <Button type="primary" onClick={()=>{
+            that.props.dispatch({
+              type:'manger/fetchDelet',
+              payload:{id:record.id}
+            })
+          }}>删除</Button>&nbsp;&nbsp;
+          <Button type="primary" onClick={()=>{
+          that.props.dispatch(
+            {
+              type:'manger/save',
+              payload:{visible:true,modalType:'edit',currentItem:record}
+            }
+          )
+          }}>修改</Button>
+        </span>
+      )
     }]
     function myFunction(page,size){
       that.props.dispatch(routerRedux.push({
@@ -66,9 +80,29 @@ class Manger extends React.Component {
 
     }
     function handleOk() {
+      that.props.form.validateFields((err,values)=>{
+        if(err){
+          return false;
+        }
+       if(that.props.modalType==='create'){
+        that.props.dispatch({
+          type:'manger/fetchCreat',
+          payload:{...values}
+        })
+        }
+        else{
+         that.props.dispatch({
+           type:'manger/fetchUpdate',
+           payload:{...values,id:that.props.currentItem.id}
+         })
+       }
+
+      })
+
 
 
     }
+
     function handleCancel() {
       that.props.dispatch({
         type:'manger/save',
@@ -86,55 +120,37 @@ class Manger extends React.Component {
         <div>
         <Button type="primary" onClick={showModal} style={{marginLeft:'80%',marginTop:'4%'}}>创建</Button>
           <Modal
-            title={'创建'}
+            title={this.props.modalType==='create'?'创建':'编辑'}
             visible={this.props.visible}
-            onOk={handleOk()}
+            onOk={handleOk}
             onCancel={handleCancel}
           >
            <Form onSubmit={this.handleSubmit}>
-              <FormItem {...formItemLayout} label="Name">
-                {getFieldDecorator('name', {
+              <FormItem {...formItemLayout} label="userame">
+                {getFieldDecorator('username', {
                   initialValue: this.props.currentItem.name ,
                   rules: [{ required: true, message: 'Please input your username!' }],
                 })(
                   <Input prefix={<Icon type="user" style={{ fontSize: 13 }} />} placeholder="Username" />
                 )}
               </FormItem>
-              <FormItem {...formItemLayout} label="nickName">
-                {getFieldDecorator('nickname', {
-                  initialValue: this.props.currentItem.nickname ,
-                  rules: [{ required: true, message: 'Please input your Password!' }],
-                })(
-                  <Input prefix={<Icon type="nick" style={{ fontSize: 13 }} />}  placeholder="nickName" />
-                )}
-              </FormItem>
-              <FormItem {...formItemLayout} label="Gender" >
-                {getFieldDecorator('sex',{
-                  initialValue: this.props.currentItem.sex ,
-                  rules: [{ required: true, message: 'Please input your username!' }],
-                })(
-                  <RadioGroup>
-                    <Radio value={"1"}>男</Radio>
-                    <Radio value={"2"}>女</Radio>
 
-                  </RadioGroup>
-                )}
-              </FormItem>
+
               <FormItem
                 {...formItemLayout}
-                label="InputNumber"
+                label="age"
               >
                 {getFieldDecorator('age',{initialValue: this.props.currentItem.age })(
                   <InputNumber min={1} max={80}  />
                 )}
 
               </FormItem>
-              <FormItem {...formItemLayout} label="phone">
-                {getFieldDecorator('phone', {
-                  initialValue: this.props.currentItem.phone ,
+              <FormItem {...formItemLayout} label="email">
+                {getFieldDecorator('email', {
+                 initialValue: this.props.currentItem.email ,
                   rules: [{ required: true, message: 'Please input your username!' }],
                 })(
-                  <Input prefix={<Icon type="phone" style={{ fontSize: 13 }} />} placeholder="phone" />
+                  <Input prefix={<Icon type="email" style={{ fontSize: 13 }} />} placeholder="email" />
                 )}
               </FormItem>
               <FormItem {...formItemLayout} label="address">
@@ -159,7 +175,7 @@ class Manger extends React.Component {
   }
 
 }
-const MangerApp = Form.create(Manger);
+const MangerApp = Form.create()(Manger);
 Manger.propTypes = {
 };
 function stateToProps(state) {

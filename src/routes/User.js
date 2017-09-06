@@ -10,7 +10,7 @@ import { Table, Icon } from 'antd';
 import { Modal, Button ,Form, Input,Checkbox,Radio,InputNumber} from 'antd';
 
 import styles from './IndexPage.css';
-import { Pagination } from 'antd';
+import { Pagination,Popconfirm, message } from 'antd';
 import { routerRedux } from 'dva/router';
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
@@ -51,6 +51,11 @@ class User extends React.Component {
       title: '性别',
       dataIndex: 'sex',
       key: 'sex',
+      render:(text, record)=>{
+        return (<div>
+          {record.sex ==='1'? '男':'女'}
+        </div>)
+      }
 
     },{
       title: '昵称',
@@ -65,12 +70,15 @@ class User extends React.Component {
         //record当前行的所有数据
         //console.log('record',record),
         <span>
-          <Button type="primary" onClick={()=>{
-      that.props.dispatch({
-         type:'user/fetchDelet',
-            payload:{id:record.id}
-     })
-          }}>delete</Button>&nbsp;&nbsp;&nbsp;
+          <Popconfirm title="确定删除吗?" onConfirm={()=>{
+            that.props.dispatch({
+              type:'user/fetchDelet',
+              payload:{id:record.id}
+            })
+          }}  okText="是" cancelText="否">
+    <Button type="primary" >delete</Button>
+  </Popconfirm>
+          &nbsp;&nbsp;&nbsp;
           <Button type="primary" onClick={()=>{
          that.props.dispatch({
            type:'user/save',
@@ -195,7 +203,10 @@ class User extends React.Component {
               <FormItem {...formItemLayout} label="phone">
                 {getFieldDecorator('phone', {
                   initialValue: this.props.currentItem.phone ,
-                  rules: [{ required: true, message: 'Please input your username!' }],
+                  rules: [{ required: true, message: 'Please input your username!' },{
+                    pattern:/^1(3|4|5|7|8)\d{9}$/,
+                    message:'电话号码格式错误'
+                  }],
                 })(
                   <Input prefix={<Icon type="phone" style={{ fontSize: 13 }} />} placeholder="phone" />
                 )}
